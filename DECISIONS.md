@@ -1,0 +1,66 @@
+# DECISIONS
+
+One entry per major decision: what we chose, what the alternatives were, and why.
+Full reasoning for the milestone 0 entries is in PLAN.md.
+
+## 2026-11-15 — Milestone 0
+
+### 1. Rebuild the pipeline from scratch
+- **Chose:** write the whole pipeline (producer, z-score consumer, schema, dashboard) new in this repo.
+- **Alternatives:** extend the original team repo.
+- **Why:** the original repo and code are lost. The design is credited to the team project; all code here is new.
+
+### 2. Data source: Alpaca Market Data API, free Basic plan
+- **Chose:** Alpaca, called with plain `requests`.
+- **Alternatives:** Tiingo (fallback), Massive/Polygon (2 years only), Finnhub (no free history), Yahoo via `yfinance` (unofficial scraper).
+- **Why:** free bars since 2016, split adjustment built in, 200 requests/min, and terms that allow personal non-commercial use.
+- **Consequences:** raw bars are never committed, the dashboard runs locally only, the README shows derived results only, CI uses synthetic bars.
+- **Open:** whether the free plan allows full-market (SIP) history or IEX only. Check at the start of milestone 2.
+
+### 3. Bar size: daily
+- **Chose:** daily bars, 2016 to present.
+- **Alternatives:** 15-minute bars.
+- **Why:** flagged dates can be looked up directly, no time-of-day pattern to remove, ten years of market regimes, fast training. Cost: a small dataset (~82k rows, estimate).
+
+### 4. Universe: 30 large US stocks listed before 2016
+- **Chose:** AAPL, MSFT, GOOGL, AMZN, NVDA, META, TSLA, BRK.B, JPM, V, MA, UNH, JNJ, PG, XOM, CVX, HD, KO, PEP, WMT, COST, DIS, NFLX, ADBE, CRM, INTC, CSCO, BAC, PFE, MRK.
+- **Alternatives:** current Dow 30 (some members lack history back to 2016).
+- **Why:** every stock has the full period. Survivorship bias is noted as a limitation.
+
+### 5. Time split
+- **Chose:** train 2016–2022, validation 2023–2024, test 2025 to latest. A window belongs to a split only if every bar is inside it.
+- **Alternatives:** random split (forbidden by the spec: it leaks the future).
+- **Why:** mirrors real use, where a model only ever sees the past.
+
+### 6. Features and scaling
+- **Chose:** log return, 20-day rolling volatility, log volume relative to its 20-day median. One mean and standard deviation per stock per feature, fitted on the training period. One model for all stocks.
+- **Alternatives:** adding high/low range; one global scaler; one model per stock.
+- **Why:** these are the three the spec names; per-stock scaling makes stocks comparable; ~1,700 windows per stock is too few for separate models.
+
+### 7. Window and model size
+- **Chose:** 30-day window; LSTM autoencoder with hidden size 32, one layer each side, bottleneck of 8 (~10,500 parameters).
+- **Alternatives:** longer windows; larger models.
+- **Why:** ~51k training windows (estimate) cannot support a big model, and a tight bottleneck is what forces unusual windows to reconstruct badly.
+
+### 8. Model anomaly score: error on the newest bar
+- **Chose:** reconstruction error of the last bar in the window.
+- **Alternatives:** error over the whole window (the spec's literal wording).
+- **Why:** a whole-window score keeps one bad day flagged for 30 bars. Newest-bar error points at the day it happened and suits a live consumer.
+
+### 9. Z-score baseline definition
+- **Chose:** rolling 20-bar z-score of log returns, flag when |z| > 3.
+- **Alternatives:** the original rule's exact settings (not recoverable).
+- **Why:** a standard form of the rule. It sees returns only, so the README compares the model mainly against detectors 2 and 3, which see all features.
+
+### 10. Thresholds come from validation, never test
+- **Chose:** set each detector's threshold on the untouched validation period at one alarm per stock per month; also report one per quarter.
+- **Alternatives:** tuning thresholds on the test set.
+- **Why:** tuning on test data would inflate every number.
+
+### 11. Tooling
+- **Chose:** `uv`, CSV files, `confluent-kafka`, `psycopg`, `ruff`, `make`, Python 3.13.
+- **Alternatives and reasons:** see PLAN.md section 9.
+
+## Still open
+- Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).
+- GitHub repo: public or private.
