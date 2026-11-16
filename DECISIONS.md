@@ -136,5 +136,21 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Result:** validation loss fell 11% (0.3765 to 0.3334), but detection barely moved. Recall at the monthly setting went from 1634/1800 (91%) to 1618/1800 (90%); at the quarterly setting from 1354/1800 (75%) to 1388/1800 (77%), with false alarms on test rising from 0.62 to 0.69 per stock per month.
 - **Lesson:** a lower reconstruction loss does not by itself mean better anomaly detection. The model is kept because it is what `make train` reproduces and early stopping chose it, not because it detects better.
 
+## 2026-11-16 — Milestone 5 (findings from results/error_analysis.md)
+
+### 26. At an equal alarm budget, the autoencoder leads only when alarms are scarce
+- **Method:** thresholds set so every detector raises the same number of alarms on the untouched test period (analysis only; headline thresholds stay on validation).
+- **Found:** overall recall at 0.25 alarms per stock per month: autoencoder 1086/1800 (60%), z-score 881/1800 (49%). At 1: autoencoder and isolation forest tie at 83%. At 2: the forest and robust z-score (95%) beat the autoencoder (92%).
+- **But by kind, at 0.5:** the z-score beats the autoencoder on spikes (82% against 76%), level shifts (72% against 64%) and volatility bursts (82% against 80%). The autoencoder's overall lead comes from volume surges, which the z-score cannot see (70% against 9%).
+- **Answer to #24:** the autoencoder's earlier spike win over the z-score at the quarterly validation threshold came from raising more alarms on test. At an equal budget, the simple rule still wins on price-only anomalies, as the spec expected.
+
+### 27. Chance floors are high for long events
+- At 1 alarm per stock per month, coincidence alone "catches" 39-48% of volatility bursts (their catch window is 7-12 days long) and 12-26% of one-day events. The z-score's 18% on volume surges equals its chance floor exactly, so it shows no skill there.
+
+### 28. Intel dominates the model's alarms on real data
+- At the quarterly threshold on untouched test data, 83 of the autoencoder's 443 alarms (19%) are Intel, and 60 of the forest's 379.
+- **Likely cause:** per-stock scaling is fitted on 2016-2022. Intel's 2024-2026 moves are far larger than its training-period ones, so ordinary days for the new Intel look unusual to both learned detectors.
+- **Possible fix, not done:** scale with a rolling window instead of fixed training statistics. It belongs in the README's limitations.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).

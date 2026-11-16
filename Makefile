@@ -1,4 +1,4 @@
-.PHONY: install test lint data earnings train compare
+.PHONY: install test lint data earnings train compare analysis
 
 install:
 	uv sync
@@ -25,3 +25,7 @@ train:
 
 compare:
 	uv run python scripts/compare.py
+
+# Needs results/comparison_events.csv from `make compare` (it cross-checks against it)
+analysis:
+	uv run python scripts/error_analysis.py

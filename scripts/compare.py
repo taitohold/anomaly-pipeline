@@ -10,12 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from anomaly.detectors import (
-    AutoencoderDetector,
-    IsolationForestDetector,
-    robust_scores,
-    zscore_scores,
-)
+from anomaly.detectors import zscore_scores
 from anomaly.earnings import earnings_mask
 from anomaly.evaluate import (
     DAYS_PER_MONTH,
@@ -25,39 +20,18 @@ from anomaly.evaluate import (
     match,
     to_positions,
     touches,
-    with_positions,
 )
-from anomaly.features import build_features
 from anomaly.inject import KINDS, inject_anomalies
-from anomaly.split import assign_split
-from anomaly.train import load_checkpoint
+from anomaly.runs import BARS, EARNINGS, PASSES, build_detectors, prepare
 
-PASSES = 10
 TARGETS = {"1 per stock per month": 1.0, "1 per stock per quarter": 1 / 3}
 FIXED = ("z-score", "|z| > 3 (the original rule)", 3.0)
 RESULTS = Path("results")
-EARNINGS = Path("data/raw/earnings.csv")
-CHECKPOINT = Path("checkpoints/autoencoder.pt")
 
 started = time.time()
-bars = pd.read_csv("data/raw/bars.csv", parse_dates=["date"])
-
-
-def prepare(raw: pd.DataFrame) -> pd.DataFrame:
-    features = build_features(raw)
-    features["split"] = assign_split(features["date"])
-    return with_positions(features)
-
-
+bars = pd.read_csv(BARS, parse_dates=["date"])
 clean = prepare(bars)
-forest = IsolationForestDetector(seed=0).fit(clean)
-autoencoder = AutoencoderDetector(*load_checkpoint(CHECKPOINT))
-DETECTORS = {
-    "z-score": zscore_scores,
-    "robust": robust_scores,
-    "isolation forest": forest.score,
-    "autoencoder": autoencoder.score,
-}
+DETECTORS = build_detectors(clean)
 
 # Thresholds come from the untouched validation period, never from test.
 settings = []

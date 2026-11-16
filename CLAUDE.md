@@ -8,7 +8,7 @@ milestone until I say the current one is done.
 ## Commands
 (Claude: fill these in as they come to exist, and keep them current.)
 - Install: `make install`
-- Run: `make data` (download bars; needs `.env`), `make earnings` (needs `SEC_USER_AGENT`), `make train`, `make compare`
+- Run: `make data` (download bars; needs `.env`), `make earnings` (needs `SEC_USER_AGENT`), `make train`, `make compare`, `make analysis`
 - Test: `make test`
 - Lint: `make lint`
 
