@@ -15,7 +15,7 @@ from anomaly.model import LSTMAutoencoder
 
 @dataclass
 class TrainConfig:
-    epochs: int = 50
+    epochs: int = 150  # 50 was not enough: validation loss was still falling (DECISIONS.md #23)
     batch_size: int = 256
     lr: float = 1e-3
     patience: int = 5  # stop after this many epochs without a better validation loss

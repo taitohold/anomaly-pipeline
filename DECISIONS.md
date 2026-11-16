@@ -131,5 +131,10 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Likely cause:** 2025-2026 looks less like the calm validation period, and reconstruction error rises across the board.
 - **Consequence:** compare at the quarterly setting too, where the overshoot is small. Milestone 5 should add a diagnostic comparing recall at equal false-alarm rates on the test period. That uses test data, so it is analysis only and never sets a reported threshold.
 
+### 25. Retrained with a 150-epoch cap
+- **Chose:** raise the default cap from 50 to 150 epochs. Early stopping ended the run at epoch 134, keeping epoch 129 (536s on CPU).
+- **Result:** validation loss fell 11% (0.3765 to 0.3334), but detection barely moved. Recall at the monthly setting went from 1634/1800 (91%) to 1618/1800 (90%); at the quarterly setting from 1354/1800 (75%) to 1388/1800 (77%), with false alarms on test rising from 0.62 to 0.69 per stock per month.
+- **Lesson:** a lower reconstruction loss does not by itself mean better anomaly detection. The model is kept because it is what `make train` reproduces and early stopping chose it, not because it detects better.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).
