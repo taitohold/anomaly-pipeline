@@ -1,0 +1,23 @@
+[project]
+name = "anomaly-pipeline"
+version = "0.1.0"
+description = "Learned anomaly detector for a market data pipeline, compared against a z-score rule."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/anomaly"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100

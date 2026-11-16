@@ -1,0 +1,18 @@
+# Market data is never committed (provider terms forbid redistribution)
+data/
+
+# Secrets
+.env
+
+# Model checkpoints and results produced by scripts
+checkpoints/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store
