@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "Learned anomaly detector for a market data pipeline, compared against a z-score rule."
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "numpy>=2.5.5",
+    "pandas>=3.1.1",
+    "requests>=2.34.2",
+]
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.8"]
