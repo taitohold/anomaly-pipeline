@@ -3,10 +3,12 @@ more unusual. Scores are returned as a Series aligned to the input's index."""
 
 import numpy as np
 import pandas as pd
+import torch
 from numpy.lib.stride_tricks import sliding_window_view
 from sklearn.ensemble import IsolationForest
 
 from anomaly.features import FEATURES
+from anomaly.model import newest_day_error
 from anomaly.split import apply_scaler, fit_scaler
 
 LOOKBACK = 20
@@ -85,3 +87,33 @@ class IsolationForestDetector:
         x = apply_scaler(features, self.scaler)[FEATURES].to_numpy()
         # score_samples is high for normal points, so flip the sign.
         return pd.Series(-self.forest.score_samples(x), index=features.index)
+
+
+class AutoencoderDetector:
+    """Detector 4: the trained LSTM autoencoder. Each day is scored by the
+    reconstruction error on the newest day of the 30-day window ending on it.
+
+    Unlike training windows, a scoring window may reach back into the previous
+    split: those days are in the past, so this is not leakage. The first
+    window - 1 days of each stock have no score.
+    """
+
+    def __init__(self, model, scaler: pd.DataFrame, window: int = 30, batch_size: int = 4096):
+        self.model = model.cpu()
+        self.scaler = scaler
+        self.window = window
+        self.batch_size = batch_size
+
+    def score(self, features: pd.DataFrame) -> pd.Series:
+        scaled = apply_scaler(features, self.scaler)
+        out = pd.Series(np.nan, index=features.index)
+        for _, stock in scaled.sort_values("date").groupby("symbol"):
+            x = stock[FEATURES].to_numpy(dtype=np.float32)
+            if len(x) < self.window:
+                continue
+            # (days - window + 1, features, window) -> (windows, window, features)
+            windows = sliding_window_view(x, self.window, axis=0).transpose(0, 2, 1)
+            batches = torch.from_numpy(np.ascontiguousarray(windows)).split(self.batch_size)
+            errors = torch.cat([newest_day_error(self.model, b) for b in batches])
+            out.loc[stock.index[self.window - 1 :]] = errors.numpy()
+        return out

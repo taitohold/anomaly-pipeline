@@ -106,5 +106,30 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Time zone (checked 2026-11-15):** I first assumed EDGAR's acceptance times were Eastern despite the "Z". The first download showed that was wrong: the times cluster at 10-12h and 20-21h, which only makes sense as UTC (6-8am and 4-5pm Eastern). The code now converts from UTC.
 - **Known gap:** Exxon (XOM) has only 2 item 2.02 filings since 2023, against a median of 16 per stock, so most of its earnings days are not masked.
 
+## 2026-11-15 — Milestone 4
+
+### 20. Overfit check: 4 windows for 3,000 steps, not 64
+- **Chose:** the sanity check memorises 4 non-overlapping windows (pass: loss below 5% of start). Real data reached 2.3%; synthetic data reached 0.8%.
+- **Alternatives:** 64 windows (the plan), or a wider model for the check.
+- **Why:** measured, the 10,475-parameter model memorises slowly. On 64 windows of synthetic noise it was still at 26% of the starting loss after 3,000 steps. The check is meant to prove the loop can learn, and 4 windows does that in under 20 seconds.
+
+### 21. Seed before building the model
+- **Found:** two runs with the same TrainConfig seed differed, because the model's starting weights are drawn when it is built, before train() seeds anything.
+- **Chose:** call set_seed() before building the model (scripts/train.py does).
+
+### 22. Train on CPU, not the Apple GPU
+- **Measured:** 3.4s per epoch on CPU, 1.5s on MPS, after warm-up.
+- **Chose:** CPU by default (`--device` can override).
+- **Why:** a full run is about 3 minutes either way, CPU results repeat exactly (MPS does not fully guarantee it), and every README number must come out the same on a rerun.
+
+### 23. The first full run hit the 50-epoch cap
+- **Observed:** validation loss was still falling at epoch 50 (0.3765), so early stopping never triggered. A longer run would probably improve the model a little.
+- **Also observed:** validation loss is below training loss. Expected: training (2016-2022) includes the 2020 crash and 2022; validation (2023-2024) was calmer and easier to rebuild.
+
+### 24. The autoencoder overshoots its alarm budget on test
+- **Observed:** thresholds set on validation for 1 alarm per stock per month gave the autoencoder 1.58 false alarms per stock per month on test, against 1.27 for the isolation forest and 0.85 for the z-score. Part of its recall lead at that setting comes from raising more alarms.
+- **Likely cause:** 2025-2026 looks less like the calm validation period, and reconstruction error rises across the board.
+- **Consequence:** compare at the quarterly setting too, where the overshoot is small. Milestone 5 should add a diagnostic comparing recall at equal false-alarm rates on the test period. That uses test data, so it is analysis only and never sets a reported threshold.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).

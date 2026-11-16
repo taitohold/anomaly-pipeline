@@ -1,4 +1,4 @@
-.PHONY: install test lint data earnings baselines
+.PHONY: install test lint data earnings train compare
 
 install:
 	uv sync
@@ -20,5 +20,8 @@ data:
 earnings:
 	uv run --env-file .env python scripts/download_earnings.py
 
-baselines:
-	uv run python scripts/evaluate_baselines.py
+train:
+	uv run python scripts/train.py
+
+compare:
+	uv run python scripts/compare.py
