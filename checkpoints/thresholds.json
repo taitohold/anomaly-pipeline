@@ -1,0 +1,10 @@
+{
+  "z-score": {
+    "threshold": 3.0,
+    "val_alarms_per_stock_month": 0.4727
+  },
+  "autoencoder": {
+    "threshold": 1.807233452796936,
+    "val_alarms_per_stock_month": 0.4727
+  }
+}

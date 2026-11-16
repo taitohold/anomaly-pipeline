@@ -1,4 +1,4 @@
-.PHONY: install test lint data earnings train compare analysis
+.PHONY: install test lint data earnings train compare analysis up replay down integration
 
 install:
 	uv sync
@@ -29,3 +29,17 @@ compare:
 # Needs results/comparison_events.csv from `make compare` (it cross-checks against it)
 analysis:
 	uv run python scripts/error_analysis.py
+
+# The streaming pipeline (needs Docker running). Dashboard: http://localhost:8501
+up:
+	docker compose up -d --build --wait redpanda postgres zscore-consumer model-consumer dashboard
+
+replay:
+	docker compose run --rm producer
+
+down:
+	docker compose down -v
+
+# Starts its own copy of the stack on synthetic data; about 3 minutes
+integration:
+	uv run pytest -m integration -v

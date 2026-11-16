@@ -152,5 +152,28 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Likely cause:** per-stock scaling is fitted on 2016-2022. Intel's 2024-2026 moves are far larger than its training-period ones, so ordinary days for the new Intel look unusual to both learned detectors.
 - **Possible fix, not done:** scale with a rolling window instead of fixed training statistics. It belongs in the README's limitations.
 
+## 2026-11-16 — Milestone 6
+
+### 29. The service reuses the offline feature and detector code
+- **Chose:** each consumer keeps the last 50 bars per stock and runs the same build_features and detector functions as the offline evaluation.
+- **Alternatives:** a separate incremental implementation (faster, but a second copy of the logic to keep in sync).
+- **Why:** it rules out train/serve skew by construction. A unit test checks streamed scores equal offline scores for every day: exactly for the z-score, and to float32 rounding (at most 2.4e-7 relative) for the autoencoder. Cost: about 167 bars per second for the model consumer, plenty for daily bars.
+
+### 30. Service thresholds: the original rule, and the model matched to it
+- **Chose:** the z-score consumer flags |z| > 3. The model's threshold is set on validation to give the same alarm rate (0.4727 per stock per month). Stored in checkpoints/thresholds.json by scripts/thresholds.py.
+- **Observed on the real 2025-2026 replay:** the z-score flagged 306 days (0.46 per stock per month, on target); the model flagged 705 (1.05, 2.3 times its target). They agreed on 168 days. The model's threshold does not hold in the newer regime: the same drift as #24 and #28.
+
+### 31. Delivery and restarts
+- **Chose:** commit the database write before the Kafka offsets (at-least-once), with upserts keyed on (symbol, date, detector) so reprocessing changes nothing. On startup a consumer reads the topic from the beginning to rebuild its in-memory windows, and ignores bars not newer than the latest it has.
+- **Alternatives:** store the windows in Postgres and resume from committed offsets.
+- **Why:** simple and correct for a replay of daily bars. It would not scale to an unbounded live topic; noted as a limitation.
+
+### 32. Model files are committed
+- **Chose:** commit checkpoints/autoencoder.pt (49 KB of weights, no market data) and thresholds.json, so `make up` runs without retraining and CI's integration test can load the model.
+
+### 33. Ports and image size
+- **Postgres is published on host port 55432** (override with PG_PORT): 5433 was already taken by another project's container on the development machine.
+- **Image size:** uv's download cache was being saved in the image (3.9 GB). A build-time cache mount brought it to 2.2 GB; PyTorch (CPU build) is about 690 MB of that.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).

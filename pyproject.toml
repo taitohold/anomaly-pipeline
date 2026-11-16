@@ -5,10 +5,13 @@ description = "Learned anomaly detector for a market data pipeline, compared aga
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "confluent-kafka>=2.16.1",
     "numpy>=2.5.5",
     "pandas>=3.1.1",
+    "psycopg[binary]>=3.3.9",
     "requests>=2.34.2",
     "scikit-learn>=1.9.1",
+    "streamlit>=1.67.0",
     "torch>=2.15.0",
 ]
 
@@ -24,6 +27,9 @@ packages = ["src/anomaly"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# The Docker Compose test is slow; run it with `pytest -m integration` (or `make integration`).
+addopts = "-m 'not integration'"
+markers = ["integration: starts the full pipeline in Docker Compose"]
 
 [tool.ruff]
 line-length = 100

@@ -1,0 +1,78 @@
+# Local pipeline: replay -> Redpanda -> two detector consumers -> Postgres -> dashboard.
+# Start with `make up`; open http://localhost:8501.
+
+x-app: &app
+  build: .
+  image: anomaly-pipeline:local
+  environment:
+    KAFKA_BOOTSTRAP: redpanda:9092
+    DATABASE_URL: postgresql://anomaly:anomaly@postgres:5432/anomaly
+
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.7
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=1
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+    ports:
+      - "19092:19092"
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 2s
+      retries: 30
+
+  postgres:
+    image: postgres:16.4
+    environment:
+      # Local-only credentials for a throwaway database.
+      POSTGRES_USER: anomaly
+      POSTGRES_PASSWORD: anomaly
+      POSTGRES_DB: anomaly
+    volumes:
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "${PG_PORT:-55432}:5432"  # host port; change with PG_PORT if 55432 is taken
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anomaly"]
+      interval: 2s
+      retries: 30
+
+  zscore-consumer:
+    <<: *app
+    command: python -m anomaly.service.consumer --detector z-score
+    depends_on:
+      redpanda: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    restart: on-failure
+
+  model-consumer:
+    <<: *app
+    command: python -m anomaly.service.consumer --detector autoencoder
+    depends_on:
+      redpanda: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    restart: on-failure
+
+  producer:
+    <<: *app
+    # Replays from REPLAY_START (default: about 50 trading days before the test period).
+    command: >
+      python -m anomaly.service.producer --file /replay/bars.csv
+      --start ${REPLAY_START:-2024-10-15} --delay ${REPLAY_DELAY:-0.05}
+    volumes:
+      - ${REPLAY_DIR:-./data/raw}:/replay:ro
+    depends_on:
+      redpanda: {condition: service_healthy}
+    restart: "no"
+
+  dashboard:
+    <<: *app
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres: {condition: service_healthy}

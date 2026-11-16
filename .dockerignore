@@ -1,0 +1,9 @@
+# Market data is mounted at run time, never baked into the image.
+data/
+.env
+.git/
+.venv/
+results/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/

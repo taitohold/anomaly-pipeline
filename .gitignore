@@ -4,8 +4,11 @@ data/
 # Secrets
 .env
 
-# Model checkpoints and results produced by scripts
-checkpoints/
+# Model checkpoints: only the final model and its thresholds are committed,
+# so the service runs without retraining (weights only, no market data)
+checkpoints/*
+!checkpoints/autoencoder.pt
+!checkpoints/thresholds.json
 
 # Python
 .venv/
