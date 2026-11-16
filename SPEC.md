@@ -42,6 +42,8 @@ Real anomalies have no labels, so the test needs planted ones.
 
 ## Pieces I write myself
 
+> **Changed 2026-11-15:** Claude writes all four of these (see DECISIONS.md #16). The README will say so.
+
 Give me the function signature and tests for each of these, and let me write the body. Review it after.
 
 * The sliding-window Dataset class

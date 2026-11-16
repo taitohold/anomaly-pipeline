@@ -8,7 +8,7 @@ milestone until I say the current one is done.
 ## Commands
 (Claude: fill these in as they come to exist, and keep them current.)
 - Install: `make install`
-- Run: (nothing to run yet)
+- Run: `make data` (download, build features, print split counts; needs `.env`)
 - Test: `make test`
 - Lint: `make lint`
 

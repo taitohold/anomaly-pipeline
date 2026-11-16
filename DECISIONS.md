@@ -61,6 +61,32 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Chose:** `uv`, CSV files, `confluent-kafka`, `psycopg`, `ruff`, `make`, Python 3.13.
 - **Alternatives and reasons:** see PLAN.md section 9.
 
+## 2026-11-15 — Milestone 2
+
+### 12. Tests and CI use synthetic bars
+- **Chose:** a seeded random-walk generator (`anomaly.synthetic.make_bars`).
+- **Alternatives:** a small committed sample of real bars.
+- **Why:** Alpaca's terms forbid redistributing its data, and CI then needs no API key.
+
+### 13. Raw data is written once
+- **Chose:** the download script refuses to run if `data/raw/bars.csv` exists, and records the feed and dates in `bars_source.txt`.
+- **Alternatives:** overwrite on every run.
+- **Why:** CLAUDE.md says raw files are never modified, and every result should trace back to one fixed download.
+
+### 14. CPU-only PyTorch on Linux
+- **Chose:** uv installs PyTorch from its CPU-only index on Linux, and the normal build on macOS (139 MB).
+- **Alternatives:** the default Linux build (539 MB plus several GB of CUDA libraries).
+- **Why:** CI has no GPU, so the CUDA libraries would only slow every run.
+
+### 15. Dataset returns tensors only, with a separate index
+- **Chose:** `__getitem__` returns just the window tensor; `self.index[i]` holds (symbol, end date).
+- **Alternatives:** return (tensor, symbol, date) tuples.
+- **Why:** the training loop only needs tensors, and DataLoader cannot batch strings or dates without extra code.
+
+### 16. Claude writes all four core pieces
+- **Chose:** the Dataset class, autoencoder model, training loop, and anomaly injection function are written by Claude (AI), not by hand. Decided 2026-11-15, while writing the Dataset.
+- **Alternatives:** write them by hand from given signatures and tests (the original plan in SPEC.md); a guided walkthrough.
+- **Why:** the owner's choice. To keep the project honest, the README must say these pieces are AI-written, and the owner should still be able to explain every line.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).
-- GitHub repo: public or private.
