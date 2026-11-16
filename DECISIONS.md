@@ -15,7 +15,7 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Alternatives:** Tiingo (fallback), Massive/Polygon (2 years only), Finnhub (no free history), Yahoo via `yfinance` (unofficial scraper).
 - **Why:** free bars since 2016, split adjustment built in, 200 requests/min, and terms that allow personal non-commercial use.
 - **Consequences:** raw bars are never committed, the dashboard runs locally only, the README shows derived results only, CI uses synthetic bars.
-- **Open:** whether the free plan allows full-market (SIP) history or IEX only. Check at the start of milestone 2.
+- **Resolved 2026-11-15:** the free plan served full-market (SIP) history. Downloaded 81,990 bars, 2016-01-04 to 2026-11-13, with no missing trading days.
 
 ### 3. Bar size: daily
 - **Chose:** daily bars, 2016 to present.
