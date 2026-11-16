@@ -1,4 +1,4 @@
-.PHONY: install test lint data
+.PHONY: install test lint data earnings baselines
 
 install:
 	uv sync
@@ -15,3 +15,10 @@ data:
 	uv run --env-file .env python scripts/download.py
 	uv run python scripts/build_features.py
 	uv run python scripts/split_counts.py
+
+# Needs SEC_USER_AGENT in .env (your name and email, as the SEC requires)
+earnings:
+	uv run --env-file .env python scripts/download_earnings.py
+
+baselines:
+	uv run python scripts/evaluate_baselines.py

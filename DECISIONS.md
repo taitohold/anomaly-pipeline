@@ -88,5 +88,22 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Alternatives:** write them by hand from given signatures and tests (the original plan in SPEC.md); a guided walkthrough.
 - **Why:** the owner's choice. To keep the project honest, the README must say these pieces are AI-written, and the owner should still be able to explain every line.
 
+## 2026-11-15 — Milestone 3
+
+### 17. How planted events are scored
+- **Chose:** consecutive flagged days in one stock form one alarm. An event is caught if an alarm overlaps its days or the 2 trading days after. A month is 21 trading days. Precision is true alarms / all alarms.
+- **Alternatives:** count flagged days instead of alarms; precision as caught events / (caught + false alarms).
+- **Why:** a real alert system notifies once per run of flagged days. Known side effect: one long event (a volatility burst) can set off several alarms that all count as true, which flatters precision slightly.
+
+### 18. Chance-level recall
+- **Observed:** the z-score sees only returns, yet "catches" 18% of volume surges. That is coincidence: at about 1 alarm per stock per month, a random alarm lands in a 3-to-5-day catch window roughly 15-20% of the time.
+- **Consequence:** recall near 18% at the monthly threshold means no skill. Milestone 5 should measure this floor directly (alarms on the untouched test set, scored against the same event windows) rather than estimate it.
+
+### 19. Earnings days as an outside check on precision
+- **Chose:** SEC EDGAR 8-K item 2.02 filings mark earnings releases; precision is also reported with false alarms within 1 trading day of the reaction day set aside.
+- **Alternatives:** treat the biggest real moves as true events (biased toward the z-score, which defines "big" the same way); inject into fully synthetic data (loses real market behaviour); a README note only.
+- **Why:** an outside source that does not depend on any detector. It misses non-earnings news, so precision still reads low.
+- **Assumption to verify:** EDGAR's acceptance times are US Eastern despite the "Z" suffix. The download script prints filings by hour so this can be checked.
+
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).
