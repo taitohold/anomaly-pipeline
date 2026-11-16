@@ -1,6 +1,6 @@
 import pandas as pd
 
-from anomaly.earnings import earnings_mask, fetch_earnings_filings
+from anomaly.earnings import earnings_mask, fetch_earnings_filings, reaction_dates
 from anomaly.evaluate import with_positions
 
 
@@ -70,11 +70,21 @@ def test_mask_starts_the_next_day_for_after_close_filings():
     filings = pd.DataFrame(
         {
             "symbol": ["AAA", "AAA"],
+            # EDGAR times are UTC. New York is UTC-5 until DST starts on 9 March 2025,
+            # then UTC-4.
             "accepted": [
-                "2025-03-05T16:05:00.000Z",  # Wed after close -> reacts Thu 6th (pos 3)
-                "2025-03-12T07:30:00.000Z",  # Wed before open -> reacts Wed 12th (pos 7)
+                "2025-03-05T21:05:00.000Z",  # Wed 4:05pm ET, after close -> Thu 6th (pos 3)
+                "2025-03-12T11:30:00.000Z",  # Wed 7:30am ET, before open -> Wed 12th (pos 7)
             ],
         }
     )
     mask = earnings_mask(filings, positions)
     assert sorted(mask["pos"]) == [2, 3, 4, 6, 7, 8]
+
+
+def test_utc_times_are_read_as_eastern():
+    """21:05 UTC in March is after the close in New York; 11:30 UTC is before the open."""
+    filings = pd.DataFrame(
+        {"symbol": ["AAA", "AAA"], "accepted": ["2025-03-05T21:05:00Z", "2025-03-12T11:30:00Z"]}
+    )
+    assert list(reaction_dates(filings)["after_close"]) == [True, False]

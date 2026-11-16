@@ -103,7 +103,8 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Chose:** SEC EDGAR 8-K item 2.02 filings mark earnings releases; precision is also reported with false alarms within 1 trading day of the reaction day set aside.
 - **Alternatives:** treat the biggest real moves as true events (biased toward the z-score, which defines "big" the same way); inject into fully synthetic data (loses real market behaviour); a README note only.
 - **Why:** an outside source that does not depend on any detector. It misses non-earnings news, so precision still reads low.
-- **Assumption to verify:** EDGAR's acceptance times are US Eastern despite the "Z" suffix. The download script prints filings by hour so this can be checked.
+- **Time zone (checked 2026-11-15):** I first assumed EDGAR's acceptance times were Eastern despite the "Z". The first download showed that was wrong: the times cluster at 10-12h and 20-21h, which only makes sense as UTC (6-8am and 4-5pm Eastern). The code now converts from UTC.
+- **Known gap:** Exxon (XOM) has only 2 item 2.02 filings since 2023, against a median of 16 per stock, so most of its earnings days are not masked.
 
 ## Still open
 - Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).

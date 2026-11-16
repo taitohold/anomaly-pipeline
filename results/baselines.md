@@ -2,7 +2,7 @@
 
 **Every number here comes from anomalies planted into real test-period bars (2025-01-02 to 2026-11-13), not from labelled real events.** 10 passes, 1,800 planted events in all. Cells show caught/planted (recall).
 
-Thresholds are set on the untouched validation period (2023-2024) to give the alarm rate named in each heading. Real unusual days in the test period count as false alarms, which pulls precision down for every detector; the earnings row sets aside false alarms that fall within a day of an earnings release (not run: no earnings data).
+Thresholds are set on the untouched validation period (2023-2024) to give the alarm rate named in each heading. Real unusual days in the test period count as false alarms, which pulls precision down for every detector; the earnings row sets aside false alarms that fall within a day of an earnings release (SEC EDGAR 8-K item 2.02).
 
 ## Threshold: 1 per stock per month on validation
 
@@ -14,7 +14,7 @@ Thresholds are set on the untouched validation period (2023-2024) to give the al
 | volume_surge | 83/450 (18%) | 380/450 (84%) | 431/450 (96%) |
 | **All kinds** | 1275/1800 (71%) | 1426/1800 (79%) | 1608/1800 (89%) |
 | Precision | 1569/7260 (22%) | 1546/7693 (20%) | 1958/10452 (19%) |
-| Precision, earnings days set aside | n/a | n/a | n/a |
+| Precision, earnings days set aside | 1569/6249 (25%) | 1546/6560 (24%) | 1958/9024 (22%) |
 | False alarms per stock per month (test) | 0.85 | 0.92 | 1.27 |
 
 ## Threshold: 1 per stock per quarter on validation
@@ -27,7 +27,7 @@ Thresholds are set on the untouched validation period (2023-2024) to give the al
 | volume_surge | 30/450 (7%) | 175/450 (39%) | 356/450 (79%) |
 | **All kinds** | 981/1800 (55%) | 825/1800 (46%) | 1236/1800 (69%) |
 | Precision | 1100/2897 (38%) | 863/3131 (28%) | 1482/5376 (28%) |
-| Precision, earnings days set aside | n/a | n/a | n/a |
+| Precision, earnings days set aside | 1100/2267 (49%) | 863/2648 (33%) | 1482/4430 (33%) |
 | False alarms per stock per month (test) | 0.27 | 0.34 | 0.58 |
 
 ## The original rule as-is: |z| > 3 (the original rule)
@@ -42,7 +42,7 @@ On validation this fixed threshold gives 0.47 alarms per stock per month.
 | volume_surge | 39/450 (9%) |
 | **All kinds** | 1074/1800 (60%) |
 | Precision | 1224/3596 (34%) |
-| Precision, earnings days set aside | n/a |
+| Precision, earnings days set aside | 1224/2854 (43%) |
 | False alarms per stock per month (test) | 0.35 |
 
 ## Recall by size, threshold 1 per stock per month

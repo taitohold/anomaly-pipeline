@@ -29,9 +29,8 @@ print(f"Wrote {len(filings)} earnings filings for {filings['symbol'].nunique()} 
 per_stock = filings["symbol"].value_counts().reindex(TICKERS, fill_value=0)
 print("Fewest filings:", per_stock.nsmallest(5).to_dict())
 
-# Check the time-zone assumption: US earnings come out before the 9:30 open or
-# after the 4pm close, so Eastern times should cluster there. If they cluster
-# 4 to 5 hours later instead, the times are really UTC.
-hours = pd.to_datetime(filings["accepted"].str.replace("Z", "", regex=False)).dt.hour
-print("Filings by hour of day:", hours.value_counts().sort_index().to_dict())
+# Check the time zone: US earnings come out before the 9:30 open or after the
+# 4pm close, so Eastern times should cluster around 6-8am and 4-5pm.
+eastern = pd.to_datetime(filings["accepted"], utc=True).dt.tz_convert("America/New_York")
+print("Filings by hour, Eastern:", eastern.dt.hour.value_counts().sort_index().to_dict())
 print(f"After the close (Eastern): {reaction_dates(filings)['after_close'].mean():.0%}")

@@ -59,11 +59,16 @@ def reaction_dates(filings: pd.DataFrame) -> pd.DataFrame:
     """Add "after_close": whether the filing came after the 4pm market close,
     in which case the market first reacts on the next trading day.
 
-    Assumption: EDGAR's acceptanceDateTime ends in "Z" but holds US Eastern
-    clock time, so the "Z" is ignored. scripts/download_earnings.py prints
-    the share of filings stamped around 4pm so this can be checked."""
+    EDGAR's acceptanceDateTime is UTC (the "Z"). It is converted to US
+    Eastern time, which handles daylight saving. Checked on the first download:
+    in UTC, filings clustered at 10-12h and 20-21h, which is 6-8am and 4-5pm
+    Eastern, the usual before-open and after-close release times."""
     out = filings.copy()
-    accepted = pd.to_datetime(out["accepted"].str.replace("Z", "", regex=False))
+    accepted = (
+        pd.to_datetime(out["accepted"], utc=True)
+        .dt.tz_convert("America/New_York")
+        .dt.tz_localize(None)
+    )
     out["filed"] = accepted.dt.normalize()
     out["after_close"] = accepted.dt.strftime("%H:%M") >= MARKET_CLOSE
     return out
