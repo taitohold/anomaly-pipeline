@@ -14,6 +14,7 @@ from anomaly.earnings import fetch_earnings_filings, reaction_dates
 
 OUT = Path("data/raw/earnings.csv")
 SINCE = "2023-01-01"  # covers the validation and test periods
+UNTIL = "2026-11-14"  # same pinned end as scripts/download.py, so reruns match
 
 if OUT.exists():
     raise SystemExit(f"{OUT} already exists. Raw data is never overwritten; move it first.")
@@ -22,6 +23,7 @@ if not user_agent:
     raise SystemExit("Set SEC_USER_AGENT in .env, e.g. SEC_USER_AGENT=Jane Doe jane@example.com")
 
 filings = fetch_earnings_filings(TICKERS, user_agent, SINCE)
+filings = filings[filings["accepted"].str[:10] <= UNTIL]
 OUT.parent.mkdir(parents=True, exist_ok=True)
 filings.to_csv(OUT, index=False)
 

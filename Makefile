@@ -1,4 +1,4 @@
-.PHONY: install test lint data earnings train compare analysis up replay down integration
+.PHONY: install test lint data earnings train compare analysis up replay down integration readme reproduce
 
 install:
 	uv sync
@@ -43,3 +43,24 @@ down:
 # Starts its own copy of the stack on synthetic data; about 3 minutes
 integration:
 	uv run pytest -m integration -v
+
+# Rewrite the README's number blocks from results/
+readme:
+	uv run python scripts/readme_results.py
+
+# Every number in the README, from scratch (about 15 minutes, mostly training).
+# Downloads run only if the raw files are missing; raw data is never overwritten.
+data/raw/bars.csv:
+	uv run --env-file .env python scripts/download.py
+
+data/raw/earnings.csv:
+	uv run --env-file .env python scripts/download_earnings.py
+
+reproduce: data/raw/bars.csv data/raw/earnings.csv
+	uv run python scripts/build_features.py
+	uv run python scripts/split_counts.py
+	uv run python scripts/train.py
+	uv run python scripts/thresholds.py
+	uv run python scripts/compare.py
+	uv run python scripts/error_analysis.py
+	uv run python scripts/readme_results.py

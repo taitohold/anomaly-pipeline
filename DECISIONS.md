@@ -175,5 +175,21 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Postgres is published on host port 55432** (override with PG_PORT): 5433 was already taken by another project's container on the development machine.
 - **Image size:** uv's download cache was being saved in the image (3.9 GB). A build-time cache mount brought it to 2.2 GB; PyTorch (CPU build) is about 690 MB of that.
 
+## 2026-11-16 — Milestone 7
+
+### 34. README numbers are generated, and a test enforces it
+- **Chose:** scripts/readme_results.py writes every number block in the README from results/, between marker comments. tests/test_readme.py fails if the README differs, so a hand-edited or stale number breaks CI. Checked by editing one number: the test failed.
+- **Alternatives:** copy numbers by hand.
+- **Why:** CLAUDE.md requires every README number to come from a rerunnable script. Narrative text avoids numbers that are not in a generated block.
+
+### 35. Download end dates are pinned
+- **Chose:** bars end 2026-11-14 (last bar 2026-11-13), and earnings filings after that date are dropped.
+- **Alternatives:** download "up to yesterday".
+- **Why:** with a moving end date, every rerun would add days and change every number. Pinned, `make reproduce` should give identical results.
+
+### 36. The README says plainly who wrote the code
+- **Chose:** the README states that all code was written by Claude (AI) under the owner's direction, extending #16, which covered only the four core pieces. In practice Claude wrote all of the code.
+- **Why:** an accurate account; the project's purpose is to show work honestly.
+
 ## Still open
-- Team project name, what it was for, and whether teammates are named (needed for the README in milestone 7).
+- Team project name, what it was for, and whether teammates are named. The README has a TODO comment where this goes.

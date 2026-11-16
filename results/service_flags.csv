@@ -1,0 +1,9 @@
+metric,value
+z-score flagged days,306.0
+autoencoder flagged days,705.0
+z-score flagged days per stock per month,0.46
+autoencoder flagged days per stock per month,1.05
+flagged by both,168.0
+flagged by z-score only,138.0
+flagged by autoencoder only,537.0
+validation alarms per stock per month (both),0.4727

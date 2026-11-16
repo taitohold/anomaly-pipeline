@@ -9,6 +9,7 @@ milestone until I say the current one is done.
 (Claude: fill these in as they come to exist, and keep them current.)
 - Install: `make install`
 - Run: `make data` (download bars; needs `.env`), `make earnings` (needs `SEC_USER_AGENT`), `make train`, `make compare`, `make analysis`
+- Reproduce all README numbers: `make reproduce` (about 15 min); `make readme` rewrites README number blocks from results/
 - Pipeline: `make up` (dashboard at http://localhost:8501), `make replay`, `make down`
 - Test: `make test` (unit), `make integration` (Docker Compose, about 30s once built)
 - Lint: `make lint`

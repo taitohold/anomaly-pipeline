@@ -383,5 +383,9 @@ caught.to_csv(RESULTS / "error_analysis_events.csv", index=False)
 fa_summary.to_csv(RESULTS / "error_analysis_alarms.csv", index=False)
 by_month.to_csv(RESULTS / "error_analysis_by_month.csv")
 top.to_csv(RESULTS / "error_analysis_top_days.csv", index=False)
+chance.to_csv(RESULTS / "error_analysis_chance.csv", index=False)
+pd.concat(
+    {n: alarms_q[n]["symbol"].value_counts() for n in names}, names=["detector", "symbol"]
+).rename("alarms").to_csv(RESULTS / "error_analysis_by_stock.csv")
 print("\n".join(md))
 print(f"\nSaved to {RESULTS}/ in {time.time() - started:.0f}s")

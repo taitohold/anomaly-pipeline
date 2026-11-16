@@ -1,0 +1,121 @@
+detector,symbol,alarms
+z-score,JPM,11
+z-score,AAPL,10
+z-score,CSCO,10
+z-score,INTC,10
+z-score,MA,10
+z-score,META,10
+z-score,UNH,10
+z-score,BAC,9
+z-score,GOOGL,9
+z-score,NFLX,9
+z-score,WMT,9
+z-score,ADBE,8
+z-score,BRK.B,8
+z-score,KO,8
+z-score,MRK,8
+z-score,V,8
+z-score,AMZN,7
+z-score,JNJ,7
+z-score,MSFT,7
+z-score,PEP,7
+z-score,COST,6
+z-score,CRM,6
+z-score,DIS,6
+z-score,PFE,6
+z-score,NVDA,5
+z-score,PG,5
+z-score,TSLA,5
+z-score,XOM,5
+z-score,CVX,4
+z-score,HD,3
+robust,CSCO,12
+robust,UNH,12
+robust,META,11
+robust,MSFT,10
+robust,AMZN,9
+robust,GOOGL,9
+robust,HD,9
+robust,V,9
+robust,WMT,9
+robust,ADBE,8
+robust,INTC,8
+robust,AAPL,7
+robust,BAC,7
+robust,CVX,7
+robust,DIS,7
+robust,MA,7
+robust,MRK,7
+robust,NFLX,7
+robust,PEP,7
+robust,COST,6
+robust,CRM,6
+robust,JNJ,6
+robust,BRK.B,4
+robust,JPM,4
+robust,KO,4
+robust,NVDA,4
+robust,PFE,4
+robust,TSLA,4
+robust,XOM,3
+robust,PG,2
+isolation forest,INTC,60
+isolation forest,MRK,27
+isolation forest,CSCO,24
+isolation forest,UNH,21
+isolation forest,META,17
+isolation forest,JNJ,16
+isolation forest,PEP,16
+isolation forest,GOOGL,15
+isolation forest,ADBE,14
+isolation forest,MSFT,14
+isolation forest,AMZN,13
+isolation forest,WMT,13
+isolation forest,CRM,12
+isolation forest,PFE,10
+isolation forest,DIS,9
+isolation forest,TSLA,9
+isolation forest,AAPL,8
+isolation forest,KO,8
+isolation forest,NVDA,8
+isolation forest,BAC,7
+isolation forest,BRK.B,7
+isolation forest,COST,7
+isolation forest,PG,7
+isolation forest,V,7
+isolation forest,CVX,6
+isolation forest,HD,6
+isolation forest,NFLX,6
+isolation forest,MA,5
+isolation forest,JPM,4
+isolation forest,XOM,3
+autoencoder,INTC,83
+autoencoder,MRK,31
+autoencoder,CSCO,24
+autoencoder,PEP,24
+autoencoder,UNH,24
+autoencoder,JNJ,19
+autoencoder,ADBE,16
+autoencoder,CRM,16
+autoencoder,GOOGL,16
+autoencoder,AAPL,15
+autoencoder,KO,14
+autoencoder,MSFT,14
+autoencoder,AMZN,13
+autoencoder,PFE,13
+autoencoder,WMT,13
+autoencoder,HD,12
+autoencoder,PG,12
+autoencoder,COST,11
+autoencoder,META,11
+autoencoder,XOM,10
+autoencoder,CVX,8
+autoencoder,TSLA,7
+autoencoder,V,7
+autoencoder,JPM,6
+autoencoder,BRK.B,5
+autoencoder,DIS,5
+autoencoder,NVDA,5
+autoencoder,BAC,4
+autoencoder,MA,3
+autoencoder,NFLX,2

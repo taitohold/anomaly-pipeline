@@ -22,10 +22,13 @@ Z_RULE = 3.0
 clean = prepare(pd.read_csv(BARS, parse_dates=["date"]))
 val = clean[clean["split"] == "val"]
 
-z_val = val.assign(score=zscore_scores(clean))
+z_scores = zscore_scores(clean)
+model_scores = AutoencoderDetector(*load_checkpoint(CHECKPOINT)).score(clean)
+
+z_val = val.assign(score=z_scores)
 target = alarm_rate(z_val.assign(flag=z_val["score"] > Z_RULE))
 
-model_val = val.assign(score=AutoencoderDetector(*load_checkpoint(CHECKPOINT)).score(clean))
+model_val = val.assign(score=model_scores)
 model_threshold = calibrate_threshold(model_val, target)
 model_rate = alarm_rate(model_val.assign(flag=model_val["score"] > model_threshold))
 
@@ -37,4 +40,32 @@ thresholds = {
     },
 }
 OUT.write_text(json.dumps(thresholds, indent=2) + "\n")
+
+# What the service will do on 2025-2026: flagged days per detector at these
+# thresholds, computed offline (the service's scores match offline, see
+# tests/test_online.py and the integration test). Saved for the README.
+test = clean[clean["split"] == "test"]
+z_flag = z_scores[test.index] > Z_RULE
+m_flag = model_scores[test.index] > model_threshold
+
+
+def per_stock_month(flags) -> float:
+    return round(flags.sum() * 21 / len(test), 2)
+
+
+pd.DataFrame(
+    [
+        {"metric": "z-score flagged days", "value": int(z_flag.sum())},
+        {"metric": "autoencoder flagged days", "value": int(m_flag.sum())},
+        {"metric": "z-score flagged days per stock per month", "value": per_stock_month(z_flag)},
+        {
+            "metric": "autoencoder flagged days per stock per month",
+            "value": per_stock_month(m_flag),
+        },
+        {"metric": "flagged by both", "value": int((z_flag & m_flag).sum())},
+        {"metric": "flagged by z-score only", "value": int((z_flag & ~m_flag).sum())},
+        {"metric": "flagged by autoencoder only", "value": int((m_flag & ~z_flag).sum())},
+        {"metric": "validation alarms per stock per month (both)", "value": round(target, 4)},
+    ]
+).to_csv("results/service_flags.csv", index=False)
 print(json.dumps(thresholds, indent=2))
