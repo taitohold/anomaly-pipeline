@@ -192,4 +192,4 @@ Full reasoning for the milestone 0 entries is in PLAN.md.
 - **Why:** an accurate account; the project's purpose is to show work honestly.
 
 ## Still open
-- Team project name, what it was for, and whether teammates are named. The README has a TODO comment where this goes.
+- Team project: named in the README as Market Anomaly Pipeline (2026-11-16). Its purpose and teammates are not described; add them if you want them credited.

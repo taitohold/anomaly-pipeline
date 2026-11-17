@@ -270,8 +270,7 @@ make down
 ## Origin and authorship
 
 - **The pipeline design** (REST API → Redpanda → z-score detector → PostgreSQL →
-  Streamlit) comes from an earlier team project I worked on.
-  <!-- TODO: name the team project, what it was for, and the teammates. -->
+  Streamlit) comes from an earlier team project I worked on, Market Anomaly Pipeline.
   That project's code was not available, so nothing here is copied from it.
 - **New in this repo:** the learned detector and its training, the planted-anomaly
   evaluation, the baselines, the error analysis, the earnings check, and the
